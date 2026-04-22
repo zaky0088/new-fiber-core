@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard Fiber</title>
+</head>
+<body>
+
+<h2>Fiber Management</h2>
+
+<input type="text" id="jalur" placeholder="Nama Jalur">
+<input type="text" id="odp" placeholder="ODP">
+<input type="number" id="core" placeholder="Core">
+<input type="number" id="pot" placeholder="Pot">
+<input type="text" id="teknisi" placeholder="Teknisi">
+
+<select id="status">
+    <option>Active</option>
+    <option>Maintenance</option>
+</select>
+
+<button onclick="tambahData()">Tambah</button>
+
+<table border="1">
+    <thead>
+        <tr>
+            <th>No</th>
+            <th>Jalur</th>
+            <th>ODP</th>
+            <th>Core</th>
+            <th>Pot</th>
+            <th>Status</th>
+            <th>Aksi</th>
+        </tr>
+    </thead>
+    <tbody id="data"></tbody>
+</table>
+
+<script>
+const API = "http://localhost:3000/jalur";
+
+function loadData() {
+    fetch(API)
+    .then(res => res.json())
+    .then(data => {
+        let html = "";
+        data.forEach((d, i) => {
+            html += `
+            <tr>
+                <td>${i+1}</td>
+                <td>${d.nama_jalur}</td>
+                <td>${d.odp}</td>
+                <td>${d.core}</td>
+                <td>${d.pot}</td>
+                <td>${d.status}</td>
+                <td>
+                    <button onclick="hapus(${d.id})">Hapus</button>
+                </td>
+            </tr>`;
+        });
+        document.getElementById("data").innerHTML = html;
+    });
+}
+
+function tambahData() {
+    const data = {
+        nama_jalur: document.getElementById("jalur").value,
+        odp: document.getElementById("odp").value,
+        core: document.getElementById("core").value,
+        pot: document.getElementById("pot").value,
+        teknisi: document.getElementById("teknisi").value,
+        status: document.getElementById("status").value
+    };
+
+    fetch(API, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(data)
+    }).then(() => loadData());
+}
+
+function hapus(id) {
+    fetch(API + "/" + id, { method: "DELETE" })
+    .then(() => loadData());
+}
+
+loadData();
+</script>
+
+</body>
+</html>
